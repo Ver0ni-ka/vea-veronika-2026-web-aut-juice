@@ -6,7 +6,7 @@ export class PaymentOptionsPage extends BasePage {
   }
 
   static get card5678(){
-    return cy.get('#mat-radio-46-input');
+    return cy.contains('mat-row', '************5678');
   }
 
   static get continueButton(){

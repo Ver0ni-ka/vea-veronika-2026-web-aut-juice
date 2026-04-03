@@ -7,8 +7,9 @@ import { DeliveryMethodPage } from '../pageObjects/deliveryMethodPage';
 import { PaymentOptionsPage } from '../pageObjects/paymentOptionsPage';
 import { OrderSummaryPage } from '../pageObjects/orderSummaryPage';
 import { OrderCompletionPage } from '../pageObjects/orderCompletionPage';
-
-
+import { SavedAddressesPage } from '../pageObjects/savedAddressesPage';
+import { CreeateAddressPage } from '../pageObjects/createAddressPage';
+import { SavedPaymentMethodsPage } from '../pageObjects/savedPaymentMethodsPage';
 
 
 describe('Juice-shop scenarios', () => {
@@ -211,7 +212,7 @@ describe('Juice-shop scenarios', () => {
     // Click on "Place your order and pay"
     // Create page object - OrderCompletionPage
     // Validate confirmation - "Thank you for your purchase!"
-    it.only('Buy Girlie T-shirt', () => {
+    it('Buy Girlie T-shirt', () => {
       HomePage.searchIcon.click();
       HomePage.searchInputField.type('Girlie{enter}');
       HomePage.addToCartGirlieButton.click();
@@ -224,11 +225,11 @@ describe('Juice-shop scenarios', () => {
       DeliveryMethodPage.standardDelivery.click();
       DeliveryMethodPage.continueButton.click();
 
-      PaymentOptionsPage.card5678.click();
+      PaymentOptionsPage.card5678.find('mat-radio-button').click();
       PaymentOptionsPage.continueButton.click();
 
       OrderSummaryPage.checkoutButton.click();
-      OrderCompletionPage.confirmation.contains('Thank you for your purchase!')
+      OrderCompletionPage.confirmation.should('contain', 'Thank you for your purchase!');
 
     });
 
@@ -242,6 +243,22 @@ describe('Juice-shop scenarios', () => {
     // Fill in the necessary information
     // Click Submit button
     // Validate that previously added address is visible
+    it('Add address', () => {
+      HomePage.accountButton.click();
+      HomePage.ordersAndPaymentButton.click();
+      HomePage.savedAddressButton.click();
+
+      SavedAddressesPage.addButton.click();
+      CreeateAddressPage.countryField.type('My country');
+      CreeateAddressPage.nameField.type('My name');
+      CreeateAddressPage.mobileNumField.type('123456789');
+      CreeateAddressPage.zipField.type('123');
+      CreeateAddressPage.addressField.type('My address');
+      CreeateAddressPage.cityField.type('My city');
+      CreeateAddressPage.submitButton.click();
+
+      SavedAddressesPage.row('My name').should('contain', 'My country').and('contain', 'My address, My city, , 123');
+    });
 
     // Create scenario - Add payment option
     // Click on Account
@@ -255,5 +272,22 @@ describe('Juice-shop scenarios', () => {
     // Set expiry year to 2090
     // Click Submit button
     // Validate that the card shows up in the list
+    it.only('Add payment option', () => {
+      HomePage.accountButton.click();
+      HomePage.ordersAndPaymentButton.click();
+      HomePage.myPaymentOptionsButton.click();
+      
+      SavedPaymentMethodsPage.addNewCardButton.click();
+      SavedPaymentMethodsPage.nameField.type('Name');
+      const randomNum = Math.floor(Math.random() * 9000) + 1000;
+      const cardNum = `${randomNum}${randomNum}${randomNum}${randomNum}`
+      SavedPaymentMethodsPage.cardNumField.type(cardNum);
+      SavedPaymentMethodsPage.selectMonthField.select('7');
+      SavedPaymentMethodsPage.yearField.select('2090');
+      SavedPaymentMethodsPage.submitButton.click();
+
+      SavedPaymentMethodsPage.row(randomNum).should('contain', 'Name').and('contain', '7/2090');
+
+    });
   });
 });
